@@ -1,12 +1,15 @@
-# Load necessary libraries
 library(ggplot2)
 library(readr)
 library(tidyr)
 library(dplyr)
 library(stats)
+library(tools)
 
 perform_analysis <- function(filename) {
+  print(paste("Reading file:", filename))
+  
   df <- read_csv(filename)
+  print("CSV file loaded successfully.")
   
   # Ensure the dataframe has 'x' and 'y' columns
   if (!("x" %in% colnames(df)) || !("y" %in% colnames(df))) {
@@ -15,33 +18,37 @@ perform_analysis <- function(filename) {
   }
   
   # Scatter plot without linear regression
-  ggplot(df, aes(x = x, y = y)) +
+  p1 <- ggplot(df, aes(x = x, y = y)) +
     geom_point(color = "blue") +
     labs(x = "x", y = "y", title = "Scatter Plot without Linear Regression") +
-    theme_minimal() +
-    ggsave("scatter_plot_without_regression.png", width = 8, height = 6)
+    theme_minimal()
+  print(p1)
+  ggsave("scatter_plot_without_regression.png", plot = p1, width = 8, height = 6)
   
   # Scatter plot with linear regression
   model <- lm(y ~ x, data = df)
   r_sq <- summary(model)$r.squared
   print(paste("Coefficient of determination (R^2):", r_sq))
   
-  ggplot(df, aes(x = x, y = y)) +
+  p2 <- ggplot(df, aes(x = x, y = y)) +
     geom_point(color = "blue") +
     geom_smooth(method = "lm", se = FALSE, color = "red", aes(group = 1)) +
     labs(x = "x", y = "y", title = "Scatter Plot with Linear Regression") +
-    theme_minimal() +
-    ggsave("scatter_plot_with_regression.png", width = 8, height = 6)
+    theme_minimal()
+  print(p2)
+  ggsave("scatter_plot_with_regression.png", plot = p2, width = 8, height = 6)
 }
 
 # Check if at least one command-line argument is provided
-if (length(commandArgs(trailingOnly = TRUE)) < 1) {
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 1) {
   print("Give me a CSV file!")
 } else {
-  filename <- commandArgs(trailingOnly = TRUE)[1]
+  filename <- args[1]
+  print(paste("Filename provided:", filename))
   
   # Check if the file is a CSV
-  if (tools::file_ext(filename) == "csv") {
+  if (file_ext(filename) == "csv") {
     perform_analysis(filename)
   } else {
     print("The file is not a CSV. Please provide a valid CSV file.")
