@@ -1,1 +1,1 @@
-# QuinnsLinearModelingRScript-
+# QuinnsLinearModelingRScript
